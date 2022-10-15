@@ -49,25 +49,25 @@ def stationList():
     temp1.radio_stn_number = 1
     temp1.radio_stn_name = "English Songs Radio"
     temp1.radio_stn_name_size = len(temp1.radio_stn_name)
-    temp1.multicast_address = "239.192.1.0"
+    temp1.multicast_address = "221.192.6.0"
     temp1.data_port = 5432
     temp1.info_port = 8001
     temp1.bit_rate = 250000
 
     temp2 = radio_stn_info()
     temp2.radio_stn_number = 2
-    temp2.radio_stn_name = "Hindi Songs Radio"
+    temp2.radio_stn_name = "Gujarati Songs Radio"
     temp2.radio_stn_name_size = len(temp2.radio_stn_name)
-    temp2.multicast_address = "239.192.1.1"
+    temp2.multicast_address = "221.192.6.2"
     temp2.data_port = 5433
     temp2.info_port = 8002
     temp2.bit_rate = 250000
 
     temp3 = radio_stn_info()
     temp3.radio_stn_number = 3
-    temp3.radio_stn_name = "Gujarati Songs Radio"
+    temp3.radio_stn_name = "Hindi Songs Radio"
     temp3.radio_stn_name_size = len(temp3.radio_stn_name)
-    temp3.multicast_address = "239.192.1.2"
+    temp3.multicast_address = "221.192.6.3"
     temp3.data_port = 5434
     temp3.info_port = 8003
     temp3.bit_rate = 250000
@@ -86,9 +86,9 @@ def tcpConnect():
     server_socket.listen(5)
 
     while True:
-        print("Server waiting for connection")
+        print("Server waiting for connection...")
         client_socket, addr = server_socket.accept()
-        print("Client connected from ", addr)
+        print("Client connected from: ", addr)
 
         data = client_socket.recv(4096)
         new_data = pickle.loads(data)
@@ -97,9 +97,9 @@ def tcpConnect():
             temp = stationList()
             client_socket.send(pickle.dumps(temp))
         except:
-            print("Exited by the user")
+            print("Exited by the user!")
         client_socket.close()
-    server_socket.close()
+        server_socket.close()
 
 #Function to transfer audio metadata through UDP over socket
 def send_audio(filename, sock, data):
@@ -108,8 +108,8 @@ def send_audio(filename, sock, data):
     wf = wave.open(filename)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, BUFF_SIZE)
     audio = pyaudio.PyAudio()
-    stream = audio.open(format=audio.get_format_from_width(wf.getsampwidth()), 
-                        channels=wf.getnchannels(), rate=wf.getframerate(), 
+    stream = audio.open(format=audio.get_format_from_width(wf.getsampwidth()),
+                        channels=wf.getnchannels(), rate=wf.getframerate(),
                         input=True, frames_per_buffer=CHUNK)
     sample_rate = wf.getframerate()
     count = 0
@@ -128,7 +128,7 @@ def udpConnect(data):
     udp_socket.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 5)
 
     station = data.radio_stn_number
-    
+
     if station == 1:
         while True:
             for file in os.listdir('./songs/english_songs'):
@@ -138,15 +138,15 @@ def udpConnect(data):
 
     if station == 2:
         while True:
-            for file in os.listdir('./songs/hindi_songs'):
-                filename=os.path.join('./songs/hindi_songs',file)
+            for file in os.listdir('./songs/gujarati_songs'):
+                filename=os.path.join('./songs/gujarati_songs',file)
                 print("Streaming "+ filename +" on ", data.radio_stn_name)
                 send_audio(filename, udp_socket, data)
 
     if station == 3:
         while True:
-            for file in os.listdir('./songs/gujarati_songs'):
-                filename=os.path.join('./songs/gujarati_songs',file)
+            for file in os.listdir('./songs/hindi_songs'):
+                filename=os.path.join('./songs/hindi_songs',file)
                 print("Streaming "+ filename +" on ", data.radio_stn_name)
                 send_audio(filename, udp_socket, data)
     
