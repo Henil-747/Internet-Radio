@@ -103,7 +103,7 @@ def stream_aud(s):
     thread1 = threading.Thread(target=getFrames, args=(s, frameQ, BUFF_SIZE))
     thread1.start()
     
-    time.sleep(5)
+    time.sleep(6)
     
     #condition for features
     while True:
